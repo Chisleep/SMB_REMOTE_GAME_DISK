@@ -1,0 +1,20 @@
+<Application x:Class="RemoteGameHub.UI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:RemoteGameHub.UI.Views"
+             StartupUri="Views/MainWindow.xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/DarkTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <!-- 全局值转换器 -->
+            <conv:CompatibilityToBrushConverter x:Key="CompatBrushConverter"/>
+            <conv:CoverPathConverter x:Key="CoverConverter"/>
+            <conv:EmptyToVisibleConverter x:Key="EmptyToVisibleConverter"/>
+            <conv:BoolToVisibleConverter x:Key="BoolToVisibleConverter"/>
+            <conv:NavToBoolConverter x:Key="NavToBoolConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

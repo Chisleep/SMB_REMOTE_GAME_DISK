@@ -1,0 +1,101 @@
+<UserControl x:Class="RemoteGameHub.UI.Views.StatsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:RemoteGameHub.UI.Models"
+             Background="{StaticResource BackgroundBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel>
+            <!-- 标题 -->
+            <TextBlock Text="📊 游戏统计" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"
+                       Foreground="{StaticResource PrimaryTextBrush}"
+                       FontFamily="Microsoft YaHei UI, Segoe UI"/>
+
+            <!-- 概览卡片 -->
+            <UniformGrid Columns="3" Margin="0,0,0,16">
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,8,0" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="游戏总数" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12"/>
+                        <TextBlock x:Name="TotalGamesText" Text="0" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"
+                                   Foreground="{StaticResource HighlightBrush}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource CardStyle}" Margin="4,0" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="总启动次数" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12"/>
+                        <TextBlock x:Name="TotalPlayCountText" Text="0" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"
+                                   Foreground="{StaticResource HighlightBrush}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource CardStyle}" Margin="8,0,0,0" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="总游玩时长" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12"/>
+                        <TextBlock x:Name="TotalPlayTimeText" Text="0分钟" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"
+                                   Foreground="{StaticResource HighlightBrush}"/>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- 启动次数排行 -->
+            <Border Style="{StaticResource CardStyle}" Padding="16" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="🏆 启动次数排行" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"
+                               Foreground="{StaticResource PrimaryTextBrush}"/>
+                    <ListBox x:Name="TopPlayedList" Background="Transparent" BorderThickness="0"
+                             MaxHeight="300"
+                             ItemContainerStyle="{StaticResource ListItemStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:GameModel}">
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="🎮" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold"
+                                               Foreground="{StaticResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding PlayTimeDisplay}" Margin="16,0,0,0"
+                                               Foreground="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="16,0,0,0">
+                                        <TextBlock Text="▶ " Foreground="{StaticResource HighlightBrush}"/>
+                                        <TextBlock Text="{Binding PlayCount}" Foreground="{StaticResource HighlightBrush}" FontWeight="Bold"/>
+                                        <TextBlock Text=" 次" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+
+            <!-- 最近游玩 -->
+            <Border Style="{StaticResource CardStyle}" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="🕐 最近游玩" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"
+                               Foreground="{StaticResource PrimaryTextBrush}"/>
+                    <ListBox x:Name="RecentPlayedList" Background="Transparent" BorderThickness="0"
+                             MaxHeight="300"
+                             ItemContainerStyle="{StaticResource ListItemStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:GameModel}">
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="🎮" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold"
+                                               Foreground="{StaticResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding LastPlayedDisplay}" Margin="16,0,0,0"
+                                               Foreground="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

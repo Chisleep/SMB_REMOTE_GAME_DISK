@@ -1,0 +1,183 @@
+<UserControl x:Class="RemoteGameHub.UI.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource BackgroundBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel MaxWidth="720">
+
+            <!-- 标题 -->
+            <TextBlock Text="⚙️ 设置" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"
+                       Foreground="{StaticResource PrimaryTextBrush}"
+                       FontFamily="Microsoft YaHei UI, Segoe UI"/>
+
+            <!-- SMB 服务器配置 -->
+            <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="SMB 服务器配置" FontSize="14" FontWeight="Bold" Margin="0,0,0,16"
+                               Foreground="{StaticResource PrimaryTextBrush}"/>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="服务器地址" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <TextBox x:Name="HostBox" Grid.Column="1" Style="{StaticResource TextBoxStyle}"
+                                 Text="192.168.5.103"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="端口" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <TextBox x:Name="PortBox" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="445"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="共享名" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <TextBox x:Name="ShareBox" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="Games"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="域 / 工作组" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <TextBox x:Name="DomainBox" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="WORKGROUP"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="用户名" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <TextBox x:Name="UserBox" Grid.Column="1" Style="{StaticResource TextBoxStyle}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="密码" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <PasswordBox x:Name="PwdBox" Grid.Column="1" Style="{StaticResource PasswordBoxStyle}"/>
+                    </Grid>
+
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Content="🔌 测试连接"
+                            HorizontalAlignment="Left" Margin="120,4,0,0" Click="OnTestConnectionClick"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 虚拟磁盘配置 -->
+            <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="虚拟磁盘配置" FontSize="14" FontWeight="Bold" Margin="0,0,0,16"
+                               Foreground="{StaticResource PrimaryTextBrush}"/>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="盘符" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <ComboBox x:Name="DriveCombo" Grid.Column="1" Background="#0d0d1f"
+                                  Foreground="{StaticResource PrimaryTextBrush}" SelectedIndex="6">
+                            <ComboBoxItem Content="A:"/>
+                            <ComboBoxItem Content="B:"/>
+                            <ComboBoxItem Content="C:"/>
+                            <ComboBoxItem Content="D:"/>
+                            <ComboBoxItem Content="E:"/>
+                            <ComboBoxItem Content="F:"/>
+                            <ComboBoxItem Content="G:"/>
+                            <ComboBoxItem Content="H:"/>
+                            <ComboBoxItem Content="I:"/>
+                            <ComboBoxItem Content="J:"/>
+                            <ComboBoxItem Content="K:"/>
+                            <ComboBoxItem Content="L:"/>
+                            <ComboBoxItem Content="M:"/>
+                            <ComboBoxItem Content="N:"/>
+                            <ComboBoxItem Content="O:"/>
+                            <ComboBoxItem Content="P:"/>
+                            <ComboBoxItem Content="Q:"/>
+                            <ComboBoxItem Content="R:"/>
+                            <ComboBoxItem Content="S:"/>
+                            <ComboBoxItem Content="T:"/>
+                            <ComboBoxItem Content="U:"/>
+                            <ComboBoxItem Content="V:"/>
+                            <ComboBoxItem Content="W:"/>
+                            <ComboBoxItem Content="X:"/>
+                            <ComboBoxItem Content="Y:"/>
+                            <ComboBoxItem Content="Z:"/>
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="内存缓存大小 (MB)" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <TextBox x:Name="CacheBox" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="512"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="启用预读" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <CheckBox x:Name="ReadAheadCheck" IsChecked="True" VerticalAlignment="Center"
+                                  Foreground="{StaticResource PrimaryTextBrush}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="预读块大小 (KB)" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <TextBox x:Name="ReadAheadBox" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="1024"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="目录缓存TTL (秒)" VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <TextBox x:Name="DirCacheBox" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="30"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 操作按钮 -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                <Button Style="{StaticResource SecondaryButtonStyle}" Content="🔄 重新加载" Margin="0,0,8,0" Click="OnReloadClick"/>
+                <Button Style="{StaticResource PrimaryButtonStyle}" Content="💾 保存配置" Click="OnSaveClick"/>
+            </StackPanel>
+
+            <!-- 状态提示 -->
+            <TextBlock x:Name="StatusTip" Text="" Margin="0,12,0,0"
+                       Foreground="{StaticResource SecondaryTextBrush}" FontSize="12"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
