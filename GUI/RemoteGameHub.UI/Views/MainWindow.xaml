@@ -1,0 +1,349 @@
+<Window x:Class="RemoteGameHub.UI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:RemoteGameHub.UI.ViewModels"
+        xmlns:models="clr-namespace:RemoteGameHub.UI.Models"
+        xmlns:conv="clr-namespace:RemoteGameHub.UI.Views"
+        Title="RemoteGameHub - 远程游戏运行管理"
+        Height="720" Width="1180"
+        MinHeight="600" MinWidth="960"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== 顶部标题栏 ===== -->
+        <Border Grid.Row="0" Background="{StaticResource CardBrush}" Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🎮 RemoteGameHub" FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource HighlightBrush}"
+                               FontFamily="Microsoft YaHei UI, Segoe UI"/>
+                    <TextBlock Text="远程游戏运行管理" FontSize="12" Margin="12,0,0,0"
+                               Foreground="{StaticResource SecondaryTextBrush}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                <Grid Grid.Column="1" Margin="24,0">
+                    <TextBox Style="{StaticResource TextBoxStyle}"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalAlignment="Center"/>
+                    <TextBlock Text="🔍 搜索游戏..." IsHitTestVisible="False"
+                               Foreground="{StaticResource SecondaryTextBrush}"
+                               VerticalAlignment="Center" Margin="10,0"
+                               Visibility="{Binding SearchText, Converter={StaticResource EmptyToVisibleConverter}}"/>
+                </Grid>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Content="🔄 刷新"
+                            Command="{Binding RefreshCommand}" Margin="0,0,8,0"/>
+                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="➕ 添加游戏"
+                            Command="{Binding AddGameCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== 主体：左侧导航 + 右侧内容 ===== -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左侧导航栏 -->
+            <Border Grid.Column="0" Background="{StaticResource CardBrush}" BorderThickness="0,0,1,0"
+                    BorderBrush="{StaticResource BorderBrush}">
+                <DockPanel>
+                    <TextBlock Text="导航" DockPanel.Dock="Top" Margin="16,12,0,8"
+                               Foreground="{StaticResource SecondaryTextBrush}" FontSize="12"/>
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                        <RadioButton Style="{StaticResource NavButtonStyle}" Content="🎮 全部游戏"
+                                     GroupName="Nav"
+                                     IsChecked="{Binding CurrentNav, Converter={StaticResource NavToBoolConverter}, ConverterParameter=AllGames, Mode=OneWay}"
+                                     Command="{Binding SelectNavCommand}" CommandParameter="{x:Static vm:NavCategory.AllGames}"/>
+                        <RadioButton Style="{StaticResource NavButtonStyle}" Content="⭐ 收藏"
+                                     GroupName="Nav"
+                                     IsChecked="{Binding CurrentNav, Converter={StaticResource NavToBoolConverter}, ConverterParameter=Favorites, Mode=OneWay}"
+                                     Command="{Binding SelectNavCommand}" CommandParameter="{x:Static vm:NavCategory.Favorites}"/>
+                        <RadioButton Style="{StaticResource NavButtonStyle}" Content="🏷️ 按标签"
+                                     GroupName="Nav"
+                                     IsChecked="{Binding CurrentNav, Converter={StaticResource NavToBoolConverter}, ConverterParameter=ByTag, Mode=OneWay}"
+                                     Command="{Binding SelectNavCommand}" CommandParameter="{x:Static vm:NavCategory.ByTag}"/>
+                        <RadioButton Style="{StaticResource NavButtonStyle}" Content="📊 统计"
+                                     GroupName="Nav"
+                                     IsChecked="{Binding CurrentNav, Converter={StaticResource NavToBoolConverter}, ConverterParameter=Stats, Mode=OneWay}"
+                                     Command="{Binding SelectNavCommand}" CommandParameter="{x:Static vm:NavCategory.Stats}"/>
+                        <RadioButton Style="{StaticResource NavButtonStyle}" Content="⚙️ 设置"
+                                     GroupName="Nav"
+                                     IsChecked="{Binding CurrentNav, Converter={StaticResource NavToBoolConverter}, ConverterParameter=Settings, Mode=OneWay}"
+                                     Command="{Binding SelectNavCommand}" CommandParameter="{x:Static vm:NavCategory.Settings}"/>
+                    </StackPanel>
+
+                    <!-- 标签列表（仅按标签分类时显示） -->
+                    <TextBlock Text="标签" DockPanel.Dock="Top" Margin="16,8,0,4"
+                               Foreground="{StaticResource SecondaryTextBrush}" FontSize="12">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentNav}" Value="{x:Static vm:NavCategory.ByTag}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <ListBox x:Name="TagListBox" Background="Transparent" BorderThickness="0"
+                             ItemsSource="{Binding AllTags}"
+                             SelectedItem="{Binding SelectedTag}"
+                             ItemContainerStyle="{StaticResource ListItemStyle}"
+                             Margin="8,0">
+                        <ListBox.Style>
+                            <Style TargetType="ListBox">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentNav}" Value="{x:Static vm:NavCategory.ByTag}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Style>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="🏷️ " Foreground="{StaticResource PrimaryTextBrush}">
+                                    <Run Text="{Binding}"/>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- 底部扫描按钮 -->
+                    <Border DockPanel.Dock="Bottom" Padding="12">
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Content="🔍 扫描SMB目录"
+                                Command="{Binding ScanCommand}" HorizontalAlignment="Stretch"/>
+                    </Border>
+                    <Border/>
+                </DockPanel>
+            </Border>
+
+            <!-- 右侧主内容区 -->
+            <Grid Grid.Column="1" Margin="0">
+                <!-- 游戏卡片网格 -->
+                <ListBox x:Name="GameGrid" Background="Transparent" BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ItemsSource="{Binding FilteredGames}"
+                         SelectedItem="{Binding SelectedGame}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="4" HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="Transparent" Padding="0">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:GameModel}">
+                            <Border Style="{StaticResource GameCardStyle}" Margin="6"
+                                    Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
+                                <Border.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="▶ 启动" FontWeight="Bold"
+                                                  Command="{Binding PlacementTarget.Tag.LaunchGameCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        <MenuItem Header="⭐ 收藏/取消收藏"
+                                                  Command="{Binding PlacementTarget.Tag.ToggleFavoriteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        <Separator/>
+                                        <MenuItem Header="🗑 删除" Foreground="{StaticResource ErrorBrush}"
+                                                  Command="{Binding PlacementTarget.Tag.RemoveGameCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+                                <StackPanel>
+                                    <!-- 封面 -->
+                                    <Border Height="160" CornerRadius="8,8,0,0" ClipToBounds="True">
+                                        <Border.Background>
+                                            <SolidColorBrush Color="#0d0d1f"/>
+                                        </Border.Background>
+                                        <Grid>
+                                            <Image Source="{Binding CoverImagePath, Converter={StaticResource CoverConverter}}"
+                                                   Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                            <!-- 兼容性标识 -->
+                                            <Border VerticalAlignment="Top" HorizontalAlignment="Right" Margin="6"
+                                                    Background="#80000000" CornerRadius="4" Padding="6,2">
+                                                <TextBlock Text="{Binding CompatibilityDisplay}" FontSize="10"
+                                                           Foreground="{Binding Compatibility, Converter={StaticResource CompatBrushConverter}}"/>
+                                            </Border>
+                                            <!-- 收藏角标 -->
+                                            <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="6"
+                                                    Background="#80000000" CornerRadius="4" Padding="6,2"
+                                                    Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibleConverter}}">
+                                                <TextBlock Text="⭐" FontSize="12"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                    <!-- 信息 -->
+                                    <StackPanel Margin="10,8">
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13"
+                                                   Foreground="{StaticResource PrimaryTextBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding TagsDisplay}" FontSize="11" Margin="0,4,0,0"
+                                                   Foreground="{StaticResource SecondaryTextBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <Grid Margin="0,6,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="▶ " Foreground="{StaticResource SecondaryTextBrush}" FontSize="11"/>
+                                                <TextBlock Text="{Binding PlayCount}" Foreground="{StaticResource SecondaryTextBrush}" FontSize="11"/>
+                                                <TextBlock Text="  ⏱ " Foreground="{StaticResource SecondaryTextBrush}" FontSize="11" Margin="6,0,0,0"/>
+                                                <TextBlock Text="{Binding PlayTimeDisplay}" Foreground="{StaticResource SecondaryTextBrush}" FontSize="11"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <Button Style="{StaticResource PrimaryButtonStyle}" Content="▶ 启动"
+                                                Margin="0,8,0,0" Padding="0,6"
+                                                Command="{Binding DataContext.LaunchGameCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.Style>
+                        <Style TargetType="ListBox">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentNav}" Value="{x:Static vm:NavCategory.Stats}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentNav}" Value="{x:Static vm:NavCategory.Settings}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.Style>
+                </ListBox>
+
+                <!-- 统计视图容器 -->
+                <ContentControl x:Name="StatsHost" Visibility="Collapsed">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentNav}" Value="{x:Static vm:NavCategory.Stats}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+
+                <!-- 设置视图容器 -->
+                <ContentControl x:Name="SettingsHost" Visibility="Collapsed">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentNav}" Value="{x:Static vm:NavCategory.Settings}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+
+                <!-- 空状态提示 -->
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FilteredGames.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentNav}" Value="{x:Static vm:NavCategory.Stats}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentNav}" Value="{x:Static vm:NavCategory.Settings}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text="🎮" FontSize="48" HorizontalAlignment="Center" Opacity="0.4"/>
+                    <TextBlock Text="暂无游戏" FontSize="16" Margin="0,12,0,0" HorizontalAlignment="Center"
+                               Foreground="{StaticResource SecondaryTextBrush}"/>
+                    <TextBlock Text="点击右上角「添加游戏」或扫描 SMB 目录" FontSize="12" Margin="0,4,0,0"
+                               HorizontalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- ===== 底部状态栏 ===== -->
+        <Border Grid.Row="2" Background="{StaticResource CardBrush}" BorderThickness="0,1,0,0"
+                BorderBrush="{StaticResource BorderBrush}" Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="10" Height="10" Margin="0,0,8,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource ErrorBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12"/>
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="|" Foreground="{StaticResource BorderBrush}" Margin="16,0"/>
+                <TextBlock Grid.Column="2" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12"
+                           VerticalAlignment="Center">
+                    <Run Text="游戏数："/><Run Text="{Binding Games.Count, Mode=OneWay}"/>
+                </TextBlock>
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="延迟：" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12"/>
+                    <TextBlock Text="{Binding LatencyText}" Foreground="{StaticResource HighlightBrush}" FontSize="12" FontWeight="Bold"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
