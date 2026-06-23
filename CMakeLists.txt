@@ -14,15 +14,15 @@ endif()
 
 # 统一使用 MSVC 编译选项
 add_compile_options(
-    /W3                # 3级警告
-    /permissive-        # 标准符合性
-    /EHsc                # C++ 异常
-    /MP                  # 并行编译
-    /D "_UNICODE         # 宽字符
+    /W3
+    /permissive-
+    /EHsc
+    /MP
+    /D "_UNICODE"
     /D "UNICODE"
     /D "_CRT_SECURE_NO_WARNINGS"
     /D "WIN32_LEAN_AND_MEAN"
-    /D "_WIN32_WINNT=0x0A00"  # Windows 10+
+    /D "_WIN32_WINNT=0x0A00"
     /D "NOMINMAX"
 )
 
@@ -30,11 +30,11 @@ add_compile_options(
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 # 输出统一输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
-# ===== 依赖路径（允许命令行覆盖
+# ===== 依赖路径（允许命令行覆盖）
 #  cmake .. -DWINFSP_DIR="C:/Program Files (x86)/WinFsp" -DSQLITE3_DIR="D:/third_party/sqlite"
 set(WINFSP_DIR "" CACHE PATH "WinFsp SDK 安装路径")
 set(SQLITE3_DIR "" CACHE PATH "SQLite 头文件+lib 目录")
@@ -43,10 +43,8 @@ set(SQLITE3_DIR "" CACHE PATH "SQLite 头文件+lib 目录")
 if(NOT WINFSP_DIR)
     if(EXISTS "C:/Program Files (x86)/WinFsp")
         set(WINFSP_DIR "C:/Program Files (x86)/WinFsp")
-    elseif(EXISTS "$ENV{ProgramFiles\(x86\)/WinFsp")
-        set(WINFSP_DIR "$ENV{ProgramFiles\(x86\)/WinFsp")
-    elseif(EXISTS "$ENV{ProgramFiles}/WinFsp")
-        set(WINFSP_DIR "$ENV{ProgramFiles}/WinFsp")
+    elseif(EXISTS "C:/Program Files/WinFsp")
+        set(WINFSP_DIR "C:/Program Files/WinFsp")
     elseif(EXISTS "${CMAKE_SOURCE_DIR}/ThirdParty/winfsp")
         set(WINFSP_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/winfsp")
     endif()
@@ -67,7 +65,7 @@ if(NOT WINFSP_DIR)
     message(FATAL_ERROR "[错误] 未找到 WinFsp 安装。请安装 WinFsp, 或运行 DevEnvSetup.bat 自动安装。")
 endif()
 if(NOT SQLITE3_DIR)
-    message(STATUS "[警告] 未找到 SQLite, 编译游戏库管理（游戏扫描/启动器数据库功能将跳过SQLite 相关模块会编译失败。请运行 DevEnvSetup.bat 自动下载。")
+    message(STATUS "[警告] 未找到 SQLite, 编译游戏库管理（游戏扫描/启动器数据库功能将跳过。SQLite 相关模块会编译失败。请运行 DevEnvSetup.bat 自动下载。")
 endif()
 
 # ===== include_directories 全局
@@ -76,11 +74,11 @@ include_directories(
     ${WINFSP_DIR}/inc
 )
 
-if(SQLITE3_DIR
-    ${SQLITE3_DIR}
+if(SQLITE3_DIR)
+    include_directories(${SQLITE3_DIR})
 endif()
 
-# ===== SQLit 核心静态库
+# ===== SQLite 核心静态库
 add_library(RemoteGameHub.Core STATIC
     Core/Common/Logger.cpp
     Core/Common/Config.cpp
@@ -99,7 +97,6 @@ add_library(RemoteGameHub.Core STATIC
 )
 
 target_link_libraries(RemoteGameHub.Core PUBLIC
-    ${SQLITE3_DIR}/sqlite3.lib
     wincred
     ws2_32
     shlwapi
@@ -110,19 +107,27 @@ target_link_libraries(RemoteGameHub.Core PUBLIC
     kernel32
 )
 
-if(EXISTS ${WINFSP_DIR}/lib/winfsp-x64.lib)
-    target_link_libraries(RemoteGameHub.Core PUBLIC ${WINFSP_DIR}/lib/winfsp-x64.lib)
-    message(STATUS "[√] 链接 WinFsp x64 导入库: winfsp-x64.lib")
-elseif(EXISTS ${WINFSP_DIR}/lib/winfsp-x86.lib)
-    target_link_libraries(RemoteGameHub.Core PUBLIC ${WINFSP_DIR}/lib/winfsp-x86.lib)
-    message(STATUS "[√] 链接 WinFsp x86 导入库: winfsp-x86.lib")
-else()
-    message(STATUS "[警告] 找不到 WinFsp .lib, 将在链接阶段可能报错， 请确认 ${WINFSP_DIR}/lib/winfsp-x64.lib")
+if(SQLITE3_DIR AND EXISTS "${SQLITE3_DIR}/sqlite3.lib")
+    target_link_libraries(RemoteGameHub.Core PUBLIC "${SQLITE3_DIR}/sqlite3.lib")
+    message(STATUS "[√] 链接 SQLite: ${SQLITE3_DIR}/sqlite3.lib")
 endif()
 
-# 游戏数据库模块 (条件编译
+if(EXISTS "${WINFSP_DIR}/lib/winfsp-x64.lib")
+    target_link_libraries(RemoteGameHub.Core PUBLIC "${WINFSP_DIR}/lib/winfsp-x64.lib")
+    message(STATUS "[√] 链接 WinFsp x64 导入库: winfsp-x64.lib")
+elseif(EXISTS "${WINFSP_DIR}/lib/winfsp-x86.lib")
+    target_link_libraries(RemoteGameHub.Core PUBLIC "${WINFSP_DIR}/lib/winfsp-x86.lib")
+    message(STATUS "[√] 链接 WinFsp x86 导入库: winfsp-x86.lib")
+else()
+    message(WARNING "[警告] 找不到 WinFsp .lib, 将在链接阶段可能报错，请确认 ${WINFSP_DIR}/lib/winfsp-x64.lib")
+endif()
+
+# 游戏数据库模块 (条件编译)
 if(SQLITE3_DIR AND EXISTS "${SQLITE3_DIR}/sqlite3.h")
-    target_sources(RemoteGameHub.Core PRIVATE Core/GameLibrary/GameDatabase.cpp Core/GameLibrary/CoverFetcher.cpp)
+    target_sources(RemoteGameHub.Core PRIVATE
+        Core/GameLibrary/GameDatabase.cpp
+        Core/GameLibrary/CoverFetcher.cpp
+    )
     message(STATUS "[√] 已包含 游戏库管理 (SQLite)")
 else()
     message(STATUS "[警告] 缺少 sqlite3.h, 跳过游戏数据库模块")
@@ -140,7 +145,8 @@ add_executable(rgh_mount
 )
 target_link_libraries(rgh_mount PRIVATE RemoteGameHub.Core)
 
-message(STATUS "\n==============================================================")
+message(STATUS "")
+message(STATUS "==============================================================")
 message(STATUS "  RemoteGameHub 构建配置完成")
 message(STATUS "  构建: cmake --build . --config Release")
 message(STATUS "==============================================================")
