@@ -1,0 +1,64 @@
+# ===== 构建产物 =====
+build/
+build-*/
+out/
+bin/
+obj/
+*.obj
+*.o
+*.out
+*.so
+*.dll
+*.exe
+*.lib
+*.ilk
+*.pdb
+*.exp
+*.idb
+*.ipdb
+*.iobj
+*.res
+
+# ===== CMake =====
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+
+# ===== IDE =====
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+*.vcxproj.filters
+*.vcxproj
+
+# ===== .NET / WPF =====
+GUI/*/bin/
+GUI/*/obj/
+GUI/*/project.lock.json
+*.userprefs
+packages/
+*.nupkg
+
+# ===== 临时文件 / 日志 =====
+*.log
+logs/
+ThirdParty/sqlite/build/
+ThirdParty/winfsp/
+
+# ===== 系统 =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ===== 编辑器 =====
+*~
+*.swp
+*.swo
+*.bak
