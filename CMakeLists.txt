@@ -18,7 +18,7 @@ add_compile_options(
     /permissive-        # 标准符合性
     /EHsc                # C++ 异常
     /MP                  # 并行编译
-    /D "_UNICODE         # 宽字符
+    /D "_UNICODE"        # 宽字符
     /D "UNICODE"
     /D "_CRT_SECURE_NO_WARNINGS"
     /D "WIN32_LEAN_AND_MEAN"
@@ -30,7 +30,7 @@ add_compile_options(
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 # 输出统一输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
@@ -43,10 +43,8 @@ set(SQLITE3_DIR "" CACHE PATH "SQLite 头文件+lib 目录")
 if(NOT WINFSP_DIR)
     if(EXISTS "C:/Program Files (x86)/WinFsp")
         set(WINFSP_DIR "C:/Program Files (x86)/WinFsp")
-    elseif(EXISTS "$ENV{ProgramFiles\(x86\)/WinFsp")
-        set(WINFSP_DIR "$ENV{ProgramFiles\(x86\)/WinFsp")
-    elseif(EXISTS "$ENV{ProgramFiles}/WinFsp")
-        set(WINFSP_DIR "$ENV{ProgramFiles}/WinFsp")
+    elseif(EXISTS "C:/Program Files/WinFsp")
+        set(WINFSP_DIR "C:/Program Files/WinFsp")
     elseif(EXISTS "${CMAKE_SOURCE_DIR}/ThirdParty/winfsp")
         set(WINFSP_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/winfsp")
     endif()
@@ -76,8 +74,8 @@ include_directories(
     ${WINFSP_DIR}/inc
 )
 
-if(SQLITE3_DIR
-    ${SQLITE3_DIR}
+if(SQLITE3_DIR)
+    include_directories(${SQLITE3_DIR})
 endif()
 
 # ===== SQLit 核心静态库
